@@ -1,13 +1,21 @@
-provider "aws" {
-  region = "ap-south-1"
-}
+data "aws_ami" "app_ami" {
+  most_recent = true
 
-data "aws_ssm_parameter" "ami" {
-  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+  owners = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-*-x86_64"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
 }
 
 resource "aws_instance" "web" {
-  ami           = data.aws_ssm_parameter.ami.value
+  ami           = data.aws_ami.app_ami.id
   instance_type = "t2.micro"
 
   tags = {
