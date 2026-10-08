@@ -1,24 +1,16 @@
-data "aws_ami" "app_ami" {
-  most_recent = true
+provider "aws" {
+  region = "ap-south-1"
+}
 
-  filter {
-    name   = "name"
-    values = ["bitnami-tomcat-*-x86_64-hvm-ebs-nami"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["979382823631"] # Bitnami
+data "aws_ssm_parameter" "ami" {
+  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
 }
 
 resource "aws_instance" "web" {
-  ami           = data.aws_ami.app_ami.id
-  instance_type = "t3.nano"
+  ami           = data.aws_ssm_parameter.ami.value
+  instance_type = "t2.micro"
 
   tags = {
-    Name = "HelloWorld"
+    Name = "Terraform-Learning"
   }
 }
